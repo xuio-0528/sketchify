@@ -52,30 +52,31 @@ def initialize_message(user_name):
 def chat(request):
         
     data=json.loads(request.body)
-    audio_data = request.FILES.get('audio')
+    # audio_data = request.FILES.get('audio')
     messages_data = data.get('messages')
     user_name = data.get('user_name')
     
     messages = convert_string_to_list(messages_data) if isinstance(messages_data, str) else messages_data
     
-    if not messages:
-        # generate initial message and gpt response
-        prompt = initialize_message(user_name)
-        response = openai.ChatCompletion.create(model = model_engine, messages=prompt)
-        system_message = response["choices"][0]["message"]["content"]
-        return Response(status=status.HTTP_200_OK, data=[{"role": "system", "content": system_message}])
+    # if not messages:
+    #     # generate initial message and gpt response
+    #     prompt = initialize_message(user_name)
+    #     response = openai.ChatCompletion.create(model = model_engine, messages=prompt)
+    #     system_message = response["choices"][0]["message"]["content"]
+    #     return Response(status=status.HTTP_200_OK, data=[{"role": "system", "content": system_message}])
     
-    else:
-        prompt = initialize_message(user_name)
-        # audio = audio_data.open()
-        # # audio_file = open(audio, "rb")
-        # audio_file = audio
-        # transcript = openai.Audio.transcribe("whisper-1", audio_file)
-        # messages.insert(0, prompt)
-        prompt.extend(messages)
-        # prompt.append({"role": "user", "content": transcript["text"]})
+    # else:
+    #     
+    #     # audio = audio_data.open()
+    #     # # audio_file = open(audio, "rb")
+    #     # audio_file = audio
+    #     # transcript = openai.Audio.transcribe("whisper-1", audio_file)
+    #     # messages.insert(0, prompt)
+    prompt = initialize_message(user_name)
+    prompt.extend(messages)
+    # prompt.append({"role": "user", "content": transcript["text"]})
 
-        response = openai.ChatCompletion.create(model=model_engine, messages=prompt)
-        system_message = response["choices"][0]["message"]["content"]
-        # return Response(status=status.HTTP_200_OK, data=[{"role": "user", "content": transcript["text"]},{"role": "system", "content": system_message}])
-        return Response(status=status.HTTP_200_OK, data=[{"role": "user", "content": messages[-1]['content']},{"role": "system", "content": system_message}])
+    response = openai.ChatCompletion.create(model=model_engine, messages=prompt)
+    system_message = response["choices"][0]["message"]["content"]
+    # return Response(status=status.HTTP_200_OK, data=[{"role": "user", "content": transcript["text"]},{"role": "system", "content": system_message}])
+    return Response(status=status.HTTP_200_OK, data=[{"role": "system", "content": system_message}])
